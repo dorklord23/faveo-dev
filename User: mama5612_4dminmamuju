@@ -1,0 +1,12 @@
+User: mama5612_4dminmamuju
+
+Database: mama5612_mamuju
+
+pass :4dminmamuju@
+
+
+
+
+$P$B9OXQDxiVXlmK1h3zG/5iyIweDmEPh1
+
+mysqldump -umamujutoda1f12 -pc01b4f202c99f3ac mamujutoday_1f12 > mamuju.sql
