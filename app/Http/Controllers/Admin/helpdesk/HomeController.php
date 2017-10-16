@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin\helpdesk;
+use Auth;
 
 /**
  * -----------------------------------------------
@@ -31,6 +32,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('themes/default1/admin/dashboard');
+        //echo 'AAAAAAAAAAa';//Auth::id();
+        return view('themes/default1/admin/dashboard');//->with('user', 'XXXXXXXXXXXXXXXX');
     }
 }

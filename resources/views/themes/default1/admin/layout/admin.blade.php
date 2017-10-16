@@ -5,7 +5,7 @@
         <title>Faveo | HELP DESK</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         <!-- faveo favicon -->
-        <link href="{{asset("lb-faveo/media/images/favicon.ico")}}" rel="shortcut icon"> 
+        <link href="{{asset("lb-faveo/media/images/favicon.ico")}}" rel="shortcut icon">
         <!-- Bootstrap 3.3.2 -->
         <link href="{{asset("lb-faveo/css/bootstrap.min.css")}}" rel="stylesheet" type="text/css" />
         <!-- Font Awesome Icons -->
@@ -33,14 +33,28 @@
         <!-- select2 -->
         <link href="{{asset("lb-faveo/plugins/select2/select2.min.css")}}" rel="stylesheet" type="text/css">
         <!-- Colorpicker -->
-        
+
         <link href="{{asset("lb-faveo/plugins/colorpicker/bootstrap-colorpicker.min.css")}}" rel="stylesheet" type="text/css" />
-        
+
+        <!--<link rel="stylesheet" href="{{asset("chat-widget/jquery-ui/jquery-ui.min.css")}}">
+        <link rel="stylesheet" href="{{asset("chat-widget/jquery-ui/jquery-ui.theme.min.css")}}">-->
+        <link rel="stylesheet" href="{{asset("chat-widget/onsenui/css/onsenui.min.css")}}">
+        <link rel="stylesheet" href="{{asset("chat-widget/onsenui/css/onsen-css-components.min.css")}}">
+        <script src="{{asset("chat-widget/onsenui/js/onsenui.min.js")}}"></script>
+
         <script src="{{asset("lb-faveo/plugins/filebrowser/plugin.js")}}" type="text/javascript"></script>
 
         <script src="{{asset("lb-faveo/js/jquery-2.1.4.js")}}" type="text/javascript"></script>
 
         <script src="{{asset("lb-faveo/js/jquery2.1.1.min.js")}}" type="text/javascript"></script>
+
+        <!--<script src="{{asset("chat-widget/jquery-ui/jquery-ui.min.js")}}"></script>-->
+
+        <script src="//{{ Request::server ("SERVER_NAME") }}:3000/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io("http://{{ Request::server ("SERVER_NAME") }}:3000")
+        </script>
+
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
@@ -48,6 +62,7 @@
         @yield('HeadInclude')
     </head>
     <body class="skin-yellow fixed">
+    <!-- /faveo/public/admin-->
         <?php
         $replacetop = 0;
         $replacetop = \Event::fire('service.desk.admin.topbar.replace', array());
@@ -225,7 +240,7 @@
                             <a  href="#">
                                 <i class="fa fa-users"></i> <span>{!! Lang::get('lang.staffs') !!}</span> <i class="fa fa-angle-left pull-right"></i>
                             </a>
-                            <ul class="treeview-menu">
+                            <ul class="treeview-menu">making
                                 <li @yield('agents')><a href="{{ url('agents') }}"><i class="fa fa-user "></i>{!! Lang::get('lang.agents') !!}</a></li>
                                 <li @yield('departments')><a href="{{ url('departments') }}"><i class="fa fa-sitemap"></i>{!! Lang::get('lang.departments') !!}</a></li>
                                 <li @yield('teams')><a href="{{ url('teams') }}"><i class="fa fa-users"></i>{!! Lang::get('lang.teams') !!}</a></li>
@@ -246,7 +261,7 @@
                                 <li @yield('email')><a href="{{url('getemail')}}"><i class="fa fa-at"></i>{!! Lang::get('lang.email-settings') !!}</a></li>
                                 <li @yield('queue')><a href="{{ url('queue') }}"><i class="fa fa-upload"></i>{!! Lang::get('lang.queues') !!}</a></li>
                                 <li @yield('diagnostics')><a href="{{ url('getdiagno') }}"><i class="fa fa-plus"></i>{!! Lang::get('lang.diagnostics') !!}</a></li>
-                               
+
                                 <!-- <li><a href="#"><i class="fa fa-circle-o"></i> Auto Response</a></li> -->
                                 <!-- <li><a href="#"><i class="fa fa-circle-o"></i> Rules/a></li> -->
                                 <!-- <li><a href="#"><i class="fa fa-circle-o"></i> Breaklines</a></li> -->
@@ -387,15 +402,15 @@
         <script src="{{asset("lb-faveo/js/app.min.js")}}" type="text/javascript"></script>
         <!-- iCheck -->
         <script src="{{asset("lb-faveo/plugins/iCheck/icheck.min.js")}}" type="text/javascript"></script>
-        
+
         <script src="{{asset("lb-faveo/plugins/datatables/dataTables.bootstrap.js")}}" type="text/javascript"></script>
-        
+
         <script src="{{asset("lb-faveo/plugins/datatables/jquery.dataTables.js")}}" type="text/javascript"></script>
         <!-- Page Script -->
         <script src="{{asset("lb-faveo/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js")}}" type="text/javascript"></script>
 
         <script src="{{asset("lb-faveo/js/jquery.dataTables1.10.10.min.js")}}"  type="text/javascript"></script>
-        
+
         <script src="{{asset("lb-faveo/plugins/datatables/dataTables.bootstrap.js")}}"  type="text/javascript"></script>
         <!-- Colorpicker -->
         <script src="{{asset("lb-faveo/plugins/colorpicker/bootstrap-colorpicker.min.js")}}" ></script>
@@ -439,24 +454,28 @@
                         }
                     });
         });</script>
-    
+
     <script src="{{asset("lb-faveo/js/tabby.js")}}"></script>
     <!-- CK Editor -->
     <script src="{{asset("lb-faveo/plugins/filebrowser/plugin.js")}}"></script>
 
     @yield('FooterInclude')
+    <script id="chat-widget" data-user_id="{{ Auth::user()->id }}" src="{{asset("chat-widget/chat/chat.js")}}"></script>
+
+    <div>{{ csrf_token() }}</div>
+
 </body>
 <script>
     $(function() {
-      
-        
+
+
         $('input[type="checkbox"]').iCheck({
             checkboxClass: 'icheckbox_flat-blue'
         });
         $('input[type="radio"]').iCheck({
             radioClass: 'iradio_flat-blue'
         });
-    
-    });        
+
+    });
 </script>
 </html>

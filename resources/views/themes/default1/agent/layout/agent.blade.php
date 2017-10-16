@@ -47,6 +47,14 @@
         <!-- fullCalendar 2.2.5-->
         <link href="{{asset('lb-faveo/plugins/fullcalendar/fullcalendar.min.css')}}" rel="stylesheet" type="text/css" />
 
+        <link rel="stylesheet" href="{{asset("chat-widget/onsenui/css/onsenui.min.css")}}">
+        <link rel="stylesheet" href="{{asset("chat-widget/onsenui/css/onsen-css-components.min.css")}}">
+        <script src="{{asset("chat-widget/onsenui/js/onsenui.min.js")}}"></script>
+        <script src="//{{ Request::server ("SERVER_NAME") }}:3000/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io("http://{{ Request::server ("SERVER_NAME") }}:3000")
+        </script>
+
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
@@ -242,10 +250,10 @@
                         @if($replaceside==0)
                         @yield('sidebar')
                         <li class="header">{!! Lang::get('lang.Tickets') !!}</li>
-                        
+
                         <li @yield('inbox')>
                              <a href="{{ url('/ticket/inbox')}}" id="load-inbox">
-                                <i class="fa fa-envelope"></i> <span>{!! Lang::get('lang.inbox') !!}</span> <small class="label pull-right bg-green">{{$tickets -> count()}}</small>                                            
+                                <i class="fa fa-envelope"></i> <span>{!! Lang::get('lang.inbox') !!}</span> <small class="label pull-right bg-green">{{$tickets -> count()}}</small>
                             </a>
                         </li>
                         <li @yield('myticket')>
@@ -266,7 +274,7 @@
                                 <small class="label pull-right bg-green">{{$overdues->count()}}</small>
                             </a>
                         </li>
-                       
+
                         <li @yield('trash')>
                              <a href="{{url('trash')}}">
                                 <i class="fa fa-trash-o"></i> <span>{!! Lang::get('lang.trash') !!}</span>
@@ -287,15 +295,15 @@
                                     $segment.="/".$seg;
                                 }
                                 if(count($segments) > 2) {
-                                    $dept2 = $segments[1]; 
+                                    $dept2 = $segments[1];
                                     $status2 = $segments[2];
                                 } else {
-                                     $dept2 = ''; 
+                                     $dept2 = '';
                                     $status2 = '';
                                 }
                             ?>
-                        @foreach($department as $name=>$dept) 
-                        
+                        @foreach($department as $name=>$dept)
+
                         <li class="treeview @if($dept2 === $name) @yield('ticket-bar') @endif ">
                             <a href="#">
                                 <i class="fa fa-folder-open"></i> <span>{!! $name !!}</span> <i class="fa fa-angle-left pull-right"></i>
@@ -307,7 +315,7 @@
                             </ul>
                            @endif
                             @endforeach
-                            
+
                         </li>
                         @endforeach
                         @else
@@ -337,7 +345,7 @@ $group = App\Model\helpdesk\Agent\Groups::where('id', '=', $agent_group)->first(
                                 <ul class="nav navbar-nav">
                                     <li id="bar" @yield('user')><a href="{{ url('user')}}" >{!! Lang::get('lang.user_directory') !!}</a></li></a></li>
                                     <li id="bar" @yield('organizations')><a href="{{ url('organizations')}}" >{!! Lang::get('lang.organizations') !!}</a></li></a></li>
-                                    
+
                                 </ul>
                             </div>
                             <div class="tabs-pane @yield('ticket-bar')" id="tabC">
@@ -523,19 +531,21 @@ $group = App\Model\helpdesk\Agent\Groups::where('id', '=', $agent_group)->first(
         </script>
         <script>
     $(function() {
-      
-        
+
+
         $('input[type="checkbox"]').iCheck({
             checkboxClass: 'icheckbox_flat-blue'
         });
         $('input[type="radio"]:not(.not-apply)').iCheck({
             radioClass: 'iradio_flat-blue'
         });
-    
-    });        
+
+    });
 </script>
 <?php Event::fire('show.calendar.script', array()); ?>
 <?php Event::fire('load-calendar-scripts', array()); ?>
         @yield('FooterInclude')
+
+        {!! Auth::guest() ? '<!--TAMU-->' : '<script id="chat-widget" data-user_id="'.Auth::user()->id.'" src="'.asset("chat-widget/chat/chat.js").'"></script>' !!}
     </body>
 </html>

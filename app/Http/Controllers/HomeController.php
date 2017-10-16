@@ -38,6 +38,12 @@ class HomeController extends Controller
         return view('themes/default1/admin/dashboard');
     }
 
+    public function iseng()
+    {
+        // ksjdckjdsnc
+        return '<h1>TRI</h1>'//view('themes/default1/admin/dashboard');
+    }
+
     public function getdata()
     {
         return \View::make('emails/notifications/agent');

@@ -21,7 +21,7 @@
 @stop
 </div><!-- /.box -->
 @section('FooterInclude')
-
+<div>user</div>
 @stop
 @stop
 <!-- /content -->

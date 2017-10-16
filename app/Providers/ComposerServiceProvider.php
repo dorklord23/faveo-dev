@@ -30,6 +30,7 @@ class ComposerServiceProvider extends ServiceProvider
                 'themes.default1.admin.layout.admin',
             ], 'App\Http\ViewComposers\AuthUser'
         );
+        //view()->composer('*', 'App\Http\ViewComposers\GlobalComposer');
     }
 
     /**

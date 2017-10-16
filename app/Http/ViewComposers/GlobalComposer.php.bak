@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Http\ViewComposers;
+
+//use App\Model\Update\BarNotification;
+//use Illuminate\View\View;
+use App\Illuminate\Support\Facades\View;
+use App\Illuminate\Support\Facades\Auth;
+//use Illuminate\Http\Request;
+
+class GlobalComposer
+{
+    public function __construct()
+    {
+    }
+
+    public function compose(View $view)
+    {
+        $view->with('authUser', 'TRI'/*Auth::user()*/);
+    }
+}

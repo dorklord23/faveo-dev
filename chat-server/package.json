@@ -1,0 +1,22 @@
+{
+  "name": "faveo-chat-server",
+  "version": "1.0.0",
+  "description": "Real-time chatting server for Faveo Helpdesk",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "keywords": [
+    "websocket"
+  ],
+  "author": "Tri R.A. Wibowo (github.com/dorklord23)",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "moment": "^2.19.1",
+    "mysql-promise": "^4.1.0",
+    "promise-mysql": "^3.1.0",
+    "socket.io": "^2.0.3"
+  }
+}

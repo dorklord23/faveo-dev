@@ -32,6 +32,15 @@
 
         <link href="{{asset("lb-faveo/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css")}}" rel="stylesheet" type="text/css" />
 
+        <link rel="stylesheet" href="{{asset("chat-widget/onsenui/css/onsenui.min.css")}}">
+        <link rel="stylesheet" href="{{asset("chat-widget/onsenui/css/onsen-css-components.min.css")}}">
+        <script src="{{asset("chat-widget/onsenui/js/onsenui.min.js")}}"></script>
+
+        <script src="//{{ Request::server ("SERVER_NAME") }}:3000/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io("http://{{ Request::server ("SERVER_NAME") }}:3000")
+        </script>
+
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
@@ -119,26 +128,26 @@
                             </ul>
                             @if(isset($errors))
                             <ul class="nav navbar-nav navbar-login">
-                                <li 
+                                <li
                                 <?php
                                 if (is_object($errors)) {
                                     if ($errors->first('email') || $errors->first('password')) {
-                                        ?> class="sfHover" 
+                                        ?> class="sfHover"
                                             <?php
                                         }
                                     }
-                                    ?> 
-                                    ><a href="#"  data-toggle="collapse"  
+                                    ?>
+                                    ><a href="#"  data-toggle="collapse"
                                         <?php
                                         if (is_object($errors)) {
                                             if ($errors->first('email') || $errors->first('password')) {
-                                                
+
                                             } else {
-                                                ?> class="collapsed" 
+                                                ?> class="collapsed"
                                             <?php
                                         }
                                     }
-                                    ?> 
+                                    ?>
                                     data-target="#login-form">{!! Lang::get('lang.login') !!} <i class="sub-indicator fa fa-chevron-circle-down fa-fw text-muted"></i></a></li>
                             </ul><!-- .navbar-login -->
                             @endif
@@ -152,9 +161,9 @@
                                         @endif
                                         @if(Session::has('error'))
                                         <div class="alert alert-danger alert-dismissable">
-                                            
+
                                             {!! Session::get('error') !!}
-                                           
+
                                         </div>
                                          @endif
                                         <?php b: ?>
@@ -212,10 +221,10 @@
                 </div>
             </header>
             <!-- Left side column. contains the logo and sidebar -->
-   
+
     <div class="site-hero clearfix">
-  
-            
+
+
                 {!! Breadcrumbs::render() !!}
             </div>
             <!-- Main content -->
@@ -448,6 +457,6 @@ $(function () {
     });
 });
             </script>
-          
+            {!! Auth::guest() ? '<!--TAMU-->' : '<script id="chat-widget" data-user_id="'.Auth::user()->id.'" src="'.asset("chat-widget/chat/chat.js").'"></script>' !!}
     </body>
 </html>
