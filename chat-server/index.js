@@ -9,10 +9,11 @@ const db = require('mysql-promise')()
 const moment = require('moment')
 
 const db_config = {
-    "host": "localhost",
-    "user": "tri",
-	"password": "#4m4l14#",
-	"database": "faveo"
+    host: "localhost",
+    user: "tri",
+	password: "#4m4l14#",
+    //port : '/Applications/MAMP/tmp/mysql/mysql.sock',
+	database: "faveo"
 }
 
 //const client_list = new Map()
@@ -130,6 +131,7 @@ io.on('connection', socket => {
         const fetch_query = `SELECT socket_id FROM contact_list WHERE user_id = ${data.recipient_id}`
         const retrieve = retrieve_chat_history.bind(null, data.sender_id, data.recipient_id, cb)
 
+        // Save as chat history
         function save_message(result)
         {
             const socket_id = result[0][0].socket_id
@@ -147,14 +149,103 @@ io.on('connection', socket => {
             // This is no longer neccessary
             // DON'T
             //delete data.recipient_id
+            const query = `SELECT first_name, last_name FROM users WHERE id = ${data.sender_id}`
+            db.query(query).then(forwarded_data =>
+            {
+                console.log('forwarded_data', forwarded_data[0][0], typeof forwarded_data[0])
+                if (forwarded_data[0].length === 0)
+                {
+                    data.sender_name = 'another user'
+                }
 
-            // Forward the message to the recipient ONLY after successfully save it to the database
-            io.sockets.connected[socket_id].emit('incoming_message', data)
+                else
+                {
+                    data.sender_name = forwarded_data[0][0].first_name + ' ' + forwarded_data[0][0].last_name
+                }
+                console.log('data.sender_name', data.sender_name)
 
-            // After forwarding the message, proceed to retrieve the latest chat history for that particular user
+                // Forward the message to the recipient ONLY after successfully save it to the database
+                io.sockets.connected[socket_id].emit('incoming_message', data)
+
+                // After forwarding the message, proceed to retrieve the latest chat history for that particular user
+            })
         }
 
-        db.query(fetch_query).then(save_message).then(forward_message).then(retrieve).catch(show_error)
+        // Save to inbox (tickets)
+        function save_to_inbox()
+        {
+            // user_id and assigned_to are not technically compulsory in tickets, but it's essential to know who the sender and the recipient of the message in chatting
+            const today = `'${moment().format('YYYY-MM-DD hh:mm:ss')}'`
+            const ticket_number = `'AAAA-0000-0010'`
+
+            const compulsory_fields =
+            {
+                ticket_number : ticket_number,//`'chat-${data.sender_id}-${data.recipient_id}-${moment().format('YYYY-MM-DD')}'`,
+                user_id : data.sender_id,
+                rating : 0,
+                ratingreply : 0,
+                flags : 0,
+                ip_address : 0,
+                assigned_to : data.recipient_id,
+                lock_by : 0,
+                isoverdue : 0,
+                reopened : 0,
+                isanswered : 0,
+                html : 0,
+                is_deleted : 0,
+                closed : 0,
+                is_transferred : 0,
+                transferred_at : today,//"'0000-00-00 00:00:00'",
+                approval : 0,
+                follow_up : 0,
+
+                // Extra
+                dept_id : 1,
+                priority_id : 2,
+                sla : 1,
+                help_topic_id : 1,
+                status : 1,
+                source : 7,
+                created_at : today,
+                updated_at : today,
+                duedate : "'9999-12-31 00:00:00'"
+            }
+
+            const query = `INSERT INTO tickets (${Object.keys(compulsory_fields).join()}) VALUES (${Object.values(compulsory_fields).join()})`
+
+            return db.query(query).then(result => { console.log('Saved to inbox', result); return result[0].insertId })
+        }
+
+        function save_thread(ticket_id)
+        {
+            const today = `'${moment().format('YYYY-MM-DD hh:mm:ss')}'`
+            const string_buffer = new Buffer(data.text)
+            const compulsory_fields =
+            {
+                ticket_id : ticket_id,
+                user_id : data.sender_id,
+                poster : "''",
+                source : 7,
+                reply_rating : 0,
+                rating_count : 0,
+                is_internal : 1,
+                title : "'Direct Chat'",
+
+                // hex string
+                body : `x'${string_buffer.toString('hex')}'`,
+
+                format : "''",
+                ip_address : "''",
+                created_at : today,
+                updated_at : today
+            }
+
+            const query = `INSERT INTO ticket_thread (${Object.keys(compulsory_fields).join()}) VALUES (${Object.values(compulsory_fields).join()})`
+
+            db.query(query).then(result => { console.log('Saved thread') })
+        }
+
+        db.query(fetch_query).then(save_message).then(forward_message).then(retrieve).then(save_to_inbox).then(save_thread).catch(show_error)
     })
 })
 

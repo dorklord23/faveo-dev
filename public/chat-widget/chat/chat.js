@@ -18,8 +18,42 @@
 
     const room = new Promise(join_room)
 
+    let unread_msg = 0
+    let notification = {}
+
     function show_error(err) {
         console.trace(err)
+    }
+
+    function notify_user(options, sender_name, title = 'You have a new message from ')
+    {
+        // Initializing notification
+        if (("Notification" in window))
+        {
+            if (Notification.permission === "granted")
+            {
+                // If it's okay let's create a notification
+                notification = new Notification(title + ' ' + sender_name, options)
+            }
+
+            // Otherwise, we need to ask the user for permission
+            else if (Notification.permission !== "denied")
+            {
+                Notification.requestPermission((permission) =>
+                {
+                    // If the user accepts, let's create a notification
+                    if (permission === "granted")
+                    {
+                        notification = new Notification(title + ' ' + sender_name, options)
+                    }
+                })
+            }
+        }
+
+        else
+        {
+            console.log("This browser doesn't support desktop notification")
+        }
     }
 
     function join_room(resolve, reject) {
@@ -111,9 +145,50 @@
     // Initialization
     room.then(retrieve_contacts).catch(show_error)
 
+    // Removing class "modal" that apparently make elements buggy in Tickets page
+    $( "#AssignTickets" ).removeClass('modal')
+    $( "#MergeTickets" ).removeClass('modal')
+    $( "#surrender" ).removeClass('modal')
+    $( "#surrender2" ).removeClass('modal')
+    $( "#addccc" ).removeClass('modal')
+    $( "#4assign" ).removeClass('modal')
+    $( "#ChangeOwner" ).removeClass('modal')
+    $( "#1assign" ).removeClass('modal')
+    $( "#banemail" ).removeClass('modal')
+    $( "#Edit" ).removeClass('modal')
+
+
     socket.on('incoming_message', (data, cb) =>
     {
+        //console.log('incoming', typeof data.sender_id, typeof parseInt($('#loading').data('recipient_id')), typeof $('#loading').data('recipient_id'))
+        const update_request =
+        {
+            sender_id : user_id,
+            recipient_id : data.sender_id
+        }
+
         // Check if the incoming message's sender is the one whose chat history is opened
+        if (data.sender_id === parseInt($('#loading').data('recipient_id')))
+        {
+            console.log('Update chat history immediately')
+            // Update chat history immediately
+            socket.emit('retrieve_chat_history', update_request, fill_chat_history.bind({update : true}, update_request.recipient_id))
+        }
+
+        else
+        {
+            console.log('Notify the user')
+            const options =
+            {
+                body : data.text
+            }
+
+            // Notify the user and ...
+            notify_user(options, data.sender_name)
+
+            // ... tell him/her that there's unred message(s)
+            //$('#new-messages').attr('title', `${++unread_msg} new messages`).html(`${unread_msg}`)
+        }
     })
 
     $('#chat-widget').after('<div id="chat-box" style="position:absolute; bottom: 1em; right: 1em"><ons-fab ripple id="chat-button"><ons-icon icon="md-inbox" size="32px, material:24px"></ons-icon></ons-fab></div>')
@@ -125,7 +200,7 @@
           <h3 class="box-title">Direct Chat</h3>
           <div class="box-tools pull-right">
 
-            <span data-toggle="tooltip" id="new-messages" title="3 New Messages" class="badge bg-green"></span>
+            <span data-toggle="tooltip" id="new-messages" class="badge bg-green"></span>
 
             <button id="contact-button" class="btn btn-box-tool" data-toggle="tooltip" title="Contacts"  data-widget="chat-pane-toggle"><i class="fa fa-comments"></i></button>
 
@@ -134,7 +209,7 @@
         <div class="box-body" style="position:relative">
 
           <div id="chat-area" class="direct-chat-messages" style="display:auto">
-            <div id="loading" style="width:100%; height: 100%">Loading chat history...</div>
+            <div id="loading" data-recipient_id="0" style="width:100%; height: 100%">Loading chat history...</div>
           </div>
 
           <!-- Contacts are loaded here -->
