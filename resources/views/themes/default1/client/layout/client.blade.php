@@ -103,7 +103,7 @@
                                                 <img src="{{Auth::user()->profile_pic}}"class="img-circle" alt="User Image" height="80" width="80"/>
                                                 <h3 class="banner-title text-info h4">{{Auth::user()->first_name." ".Auth::user()->last_name}}</h3>
                                                 <div class="banner-content">
-                                                    {{-- <a href="{{url('kb/client-profile')}}" class="btn btn-custom btn-xs">{!! Lang::get('lang.edit_profile') !!}</a> --}} <a href="{{url('auth/logout')}}" class="btn btn-custom btn-xs">{!! Lang::get('lang.log_out') !!}</a>
+                                                    {{-- <a href="{{url('kb/client-profile')}}" class="btn btn-custom btn-xs">{!! Lang::get('lang.edit_profile') !!}</a> --}} <a href="{{url('auth/logout')}}" id="sign-out" class="btn btn-custom btn-xs">{!! Lang::get('lang.log_out') !!}</a>
                                                 </div>
                                                 @if(Auth::user())
                                                 @if(Auth::user()->role != 'user')
@@ -457,6 +457,6 @@ $(function () {
     });
 });
             </script>
-            {!! Auth::guest() ? '<!--TAMU-->' : '<script id="chat-widget" data-user_id="'.Auth::user()->id.'" src="'.asset("chat-widget/chat/chat.js").'"></script>' !!}
+            {!! Auth::guest() ? '<!--TAMU-->' : '<script id="chat-widget" data-user_id="'.Auth::user()->id.'" data-avatar="'.Auth::user()->profile_pic.'" src="'.asset("chat-widget/chat/chat.js").'"></script>' !!}
     </body>
 </html>

@@ -15,6 +15,7 @@
 
     const script = document.getElementById('chat-widget')
     const user_id = parseInt(script.dataset.user_id)
+    const avatar = script.dataset.avatar
 
     const room = new Promise(join_room)
 
@@ -103,15 +104,15 @@
         {
             console.log('x', data)
             let positions = []
-            let bottom_msg = ''
+            let prof_pic = ''
 
             // This is the so-called "lawan bicara"
             if (target_id === data.recipient_id) {
-                positions = ['left', 'right']
+                positions = ['left', 'right', this.sender_pic]
             }
 
             else {
-                positions = ['right', 'left']
+                positions = ['right', 'left', avatar]
             }
 
             const box = `<div class="direct-chat-msg ${positions[0]}">
@@ -119,7 +120,7 @@
                 <span class="direct-chat-name pull-${positions[0]}">${data.first_name + ' ' + data.last_name}</span>
                 <span class="direct-chat-timestamp pull-${positions[1]}">${data.date.slice(0, 10)} ${data.time}</span>
               </div>
-              <img class="direct-chat-img" src="" alt="message user image">
+              <img class="direct-chat-img" src="${positions[2]}" alt="Avatar" onError="this.onerror=null;this.src='${positions[2]}';">
               <div class="direct-chat-text">${data.text}</div>
             </div>`
 
@@ -136,7 +137,7 @@
             return $('#loading').replaceWith(`<div id="loading" data-recipient_id="${target_id}">No chat whatsoever</div>`)
         }
 
-        const history_display = history.map(boxify)
+        const history_display = history.map(boxify.bind(this))
         //console.log(history_display)
 
         $('#loading').replaceWith(`<div id="loading" data-recipient_id="${target_id}">` + history_display + '</div>')
@@ -172,7 +173,7 @@
         {
             console.log('Update chat history immediately')
             // Update chat history immediately
-            socket.emit('retrieve_chat_history', update_request, fill_chat_history.bind({update : true}, update_request.recipient_id))
+            socket.emit('retrieve_chat_history', update_request, fill_chat_history.bind({update : true, sender_pic : data.sender_pic}, update_request.recipient_id))
         }
 
         else
@@ -194,7 +195,7 @@
     $('#chat-widget').after('<div id="chat-box" style="position:absolute; bottom: 1em; right: 1em"><ons-fab ripple id="chat-button"><ons-icon icon="md-inbox" size="32px, material:24px"></ons-icon></ons-fab></div>')
 
     //$('#chat-box').after(<div id="chat-room" style="display: none;  overflow:auto; border-radius: 10px; background-color: red; position: absolute; bottom: 3em; right: 3em; height: 33%; width: 20%"><ons-page><ons-toolbar><div class="center">IM</div><div class="right"><ons-toolbar-button><ons-icon icon="ion-close-round, material:md-menu"></ons-icon></ons-toolbar-button></div></ons-toolbar><div style="position: absolute; bottom: 0em; max-width:60%; float: left"><ons-input id="username" modifier="underbar" placeholder="Username" float></ons-input></div><div style="position: absolute; bottom: 0em; right: 0em; overflow: hidden"><ons-button onclick="return false">SEND</ons-button></div></ons-page></div>')
-    $('#chat-box').after(`<div id="chat-room" style="display: inline; border-radius: 10px; background-color: red; position: absolute; bottom: 9em; right: 4em; height: 40%; width: 20%; z-index:99999">
+    $('#chat-box').after(`<div id="chat-room" style="display: none; border-radius: 10px; background-color: red; position: absolute; bottom: 9em; right: 4em; height: 40%; width: 20%; z-index:99999">
       <div class="box box-primary direct-chat direct-chat-primary">
         <div class="box-header with-border">
           <h3 class="box-title">Direct Chat</h3>
@@ -249,11 +250,12 @@
     $('#send-chat').click((event) => {
         const data = {
             sender_id : user_id,
+            sender_pic : avatar,
             recipient_id : parseInt($('#loading').data('recipient_id')),
             text : $('#chat-input').val()
         }
 
-        socket.emit('send_new_message', data, fill_chat_history.bind({update : true}, data.recipient_id))
+        socket.emit('send_new_message', data, fill_chat_history.bind({update : true, sender_pic : avatar}, data.recipient_id))
     })
 
     // Select the active contact
@@ -273,10 +275,22 @@
                 return event.preventDefault()
             }
 
-            socket.emit('retrieve_chat_history', data, fill_chat_history.bind({update : false}, recipient_id))
+            socket.emit('retrieve_chat_history', data, fill_chat_history.bind({update : false, sender_pic : avatar}, recipient_id))
         }
 
         catch(err) {
+            show_error(err)
+        }
+    })
+
+    $('#sign-out').click((event) => {
+        try
+        {
+            socket.emit('disconnect', {}, alert)
+        }
+
+        catch(err)
+        {
             show_error(err)
         }
     })

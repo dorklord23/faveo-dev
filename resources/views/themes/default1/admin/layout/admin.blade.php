@@ -197,7 +197,7 @@
                                         <a href="{{url('admin-profile')}}" class="btn btn-info btn-sm"><b>{!! Lang::get('lang.profile') !!}</b></a>
                                     </div>
                                     <div class="pull-right">
-                                        <a href="{{url('auth/logout')}}" class="btn btn-danger btn-sm"><b>{!! Lang::get('lang.sign_out') !!}</b></a>
+                                        <a href="{{url('auth/logout')}}" id="sign-out" class="btn btn-danger btn-sm"><b>{!! Lang::get('lang.sign_out') !!}</b></a>
                                     </div>
                                 </li>
                             </ul>
@@ -460,8 +460,14 @@
     <script src="{{asset("lb-faveo/plugins/filebrowser/plugin.js")}}"></script>
 
     @yield('FooterInclude')
-    <script id="chat-widget" data-user_id="{{ Auth::user()->id }}" src="{{asset("chat-widget/chat/chat.js")}}"></script>
-
+    <?php
+        echo 'Pic : '.Auth::user()->profile_pic;
+        /*if (Auth::user()->email == "Not available")
+        {
+            $avatar = 'c'
+        }*/
+    ?>
+    <script id="chat-widget" data-user_id="{{ Auth::user()->id }}" data-avatar="{!! Auth::user()->profile_pic !!}" src="{{asset("chat-widget/chat/chat.js")}}"></script>
     <div>{{ csrf_token() }}</div>
 
 </body>

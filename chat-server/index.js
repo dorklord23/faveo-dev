@@ -53,7 +53,7 @@ io.on('connection', socket => {
         {
             // Updating client list (insert new user's socket ID or replace it with new socket ID)
             // OBSOLETE : client_list.set(data.user_id, socket.id)
-            const query = `INSERT INTO contact_list (user_id, socket_id, status) VALUES (${data.user_id}, '${socket.id}', 'online') ON DUPLICATE KEY UPDATE socket_id = '${socket.id}'`
+            const query = `INSERT INTO contact_list (user_id, socket_id, status) VALUES (${data.user_id}, '${socket.id}', 'online') ON DUPLICATE KEY UPDATE socket_id = '${socket.id}', status = 'online'`
 
             db.query(query).then(result =>
             {
@@ -89,7 +89,7 @@ io.on('connection', socket => {
                 }
             }*/
 
-            const query = `SELECT u.id, first_name, last_name, c.status FROM users u JOIN contact_list c ON u.id = c.user_id`
+            const query = `SELECT u.id, first_name, last_name, c.status FROM users u JOIN contact_list c ON u.id = c.user_id WHERE u.id <> ${data.user_id}`
 
             db.query(query).then(data => {cb(data[0])})
 
@@ -150,6 +150,7 @@ io.on('connection', socket => {
             // DON'T
             //delete data.recipient_id
             const query = `SELECT first_name, last_name FROM users WHERE id = ${data.sender_id}`
+
             db.query(query).then(forwarded_data =>
             {
                 console.log('forwarded_data', forwarded_data[0][0], typeof forwarded_data[0])
@@ -162,7 +163,8 @@ io.on('connection', socket => {
                 {
                     data.sender_name = forwarded_data[0][0].first_name + ' ' + forwarded_data[0][0].last_name
                 }
-                console.log('data.sender_name', data.sender_name)
+
+                //console.log('data.sender_name', data.sender_name)
 
                 // Forward the message to the recipient ONLY after successfully save it to the database
                 io.sockets.connected[socket_id].emit('incoming_message', data)
@@ -201,11 +203,11 @@ io.on('connection', socket => {
 
                 // Extra
                 dept_id : 1,
-                priority_id : 2,
+                priority_id : 2, // Normal priority
                 sla : 1,
                 help_topic_id : 1,
                 status : 1,
-                source : 7,
+                source : 7, // From chat
                 created_at : today,
                 updated_at : today,
                 duedate : "'9999-12-31 00:00:00'"
@@ -213,7 +215,7 @@ io.on('connection', socket => {
 
             const query = `INSERT INTO tickets (${Object.keys(compulsory_fields).join()}) VALUES (${Object.values(compulsory_fields).join()})`
 
-            return db.query(query).then(result => { console.log('Saved to inbox', result); return result[0].insertId })
+            return db.query(query).then(result => { console.log('Saved to inbox'); return result[0].insertId })
         }
 
         function save_thread(ticket_id)
@@ -224,7 +226,7 @@ io.on('connection', socket => {
             {
                 ticket_id : ticket_id,
                 user_id : data.sender_id,
-                poster : "''",
+                poster : "'client'",
                 source : 7,
                 reply_rating : 0,
                 rating_count : 0,
@@ -247,8 +249,28 @@ io.on('connection', socket => {
 
         db.query(fetch_query).then(save_message).then(forward_message).then(retrieve).then(save_to_inbox).then(save_thread).catch(show_error)
     })
-})
 
+    socket.on('disconnect', data=> {
+        try
+        {
+            // Updating client list
+            const query = `UPDATE contact_list SET status = 'offline' WHERE socket_id = '${socket.id}'`
+            //const query = `INSERT INTO contact_list (user_id, socket_id, status) VALUES (${data.user_id}, '${socket.id}', 'offline') ON DUPLICATE KEY UPDATE socket_id = '${socket.id}'`
+
+            db.query(query).then(result =>
+            {
+                console.log(`${socket.id} has disconnected`)
+                //console.log(result)
+            })
+        }
+
+        catch(err)
+        {
+            console.trace(err)
+            console.log(`${socket.id} has FAILED to disconnect`)
+        }
+    });
+})
 
 // Initializing HTTP connection
 http.listen(3000, () => {
@@ -256,4 +278,12 @@ http.listen(3000, () => {
 })
 
 // NOTE : data[0] is RowDataPacket while data[1] is FieldPacket
-//db.query('SELECT * FROM users').then(data => {console.log(data[1])})
+/*
+[Wed Oct 18 21:06:40.002520 2017] [:error] [pid 18163] [client ::1:60332] PHP Fatal error:  Uncaught DaveJamesMiller\Breadcrumbs\Exception: Breadcrumb not found with name "ticket.tooltip" in /home/aria/Projects/proyek-faveo-real-time-chat/vendor/davejamesmiller/laravel-breadcrumbs/src/Generator.php:20
+Stack trace:
+#0 /home/aria/Projects/proyek-faveo-real-time-chat/vendor/davejamesmiller/laravel-breadcrumbs/src/Generator.php(13): DaveJamesMiller\Breadcrumbs\Generator->call('ticket.tooltip', Array)
+#1 /home/aria/Projects/proyek-faveo-real-time-chat/vendor/davejamesmiller/laravel-breadcrumbs/src/Manager.php(92): DaveJamesMiller\Breadcrumbs\Generator->generate(Array, 'ticket.tooltip', Array)
+#2 /home/aria/Projects/proyek-faveo-real-time-chat/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(215): DaveJamesMiller\Breadcrumbs\Manager->render()
+#3 /home/aria/Projects/proyek-faveo-real-time-chat/storage/framework/views/809c71c2a0eb5a7ca482e1cd755a8681bce26655.php(238): Illuminate\Support\Facades\Facade::__callStatic('render', Array)
+#4 /home/aria/Projects/proyek-faveo-real-time-chat/vendor/ in /home/aria/Projects/proyek-faveo-real-time-chat/vendor/davejamesmiller/laravel-breadcrumbs/src/Generator.php on line 20, referer: http://localhost:8080/faveo/public/ticket/inbox
+*/
