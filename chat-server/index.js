@@ -230,7 +230,11 @@ io.on('connection', socket => {
                 source : 7,
                 reply_rating : 0,
                 rating_count : 0,
-                is_internal : 1,
+
+                // NOTE : Arbitrarily set is_internal to 1 might cause serious bug
+                // See {project_dir}/resources/views/themes/default1/agent/helpdesk/ticket/timeline.blade.php:275
+                is_internal : 0,
+
                 title : "'Direct Chat'",
 
                 // hex string

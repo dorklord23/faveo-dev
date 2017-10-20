@@ -49,7 +49,7 @@
         <script src="{{asset("lb-faveo/js/jquery2.1.1.min.js")}}" type="text/javascript"></script>
         @yield('HeadInclude')
     </head>
-    <body>
+    <body style="overflow:scroll">
         <div id="page" class="hfeed site">
             <header id="masthead" class="site-header" role="banner">
                 <div class="container" style="">
@@ -224,8 +224,7 @@
 
     <div class="site-hero clearfix">
 
-
-                {!! Breadcrumbs::render() !!}
+{!! '<!--remah2-->'.Breadcrumbs::render().'<!--remah2-->'  !!}
             </div>
             <!-- Main content -->
             <div id="main" class="site-main clearfix">

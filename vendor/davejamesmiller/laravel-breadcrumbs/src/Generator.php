@@ -1,5 +1,5 @@
 <?php namespace DaveJamesMiller\Breadcrumbs;
-
+use Illuminate\Support\Facades\Log;
 class Generator {
 
 	protected $breadcrumbs = [];
@@ -16,6 +16,7 @@ class Generator {
 
 	protected function call($name, $params)
 	{
+		if ($name == 'ticket.tooltip')   Log::info('Showing user profile for user: ');
 		if (!isset($this->callbacks[$name]))
 			throw new Exception("Breadcrumb not found with name \"{$name}\"");
 

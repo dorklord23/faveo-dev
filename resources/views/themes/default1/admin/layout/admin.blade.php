@@ -61,7 +61,7 @@
         <![endif]-->
         @yield('HeadInclude')
     </head>
-    <body class="skin-yellow fixed">
+    <body class="skin-yellow fixed" style="overflow:scroll">
     <!-- /faveo/public/admin-->
         <?php
         $replacetop = 0;
@@ -369,7 +369,7 @@
                     <!--<div class="col-md-6">-->
                     @yield('PageHeader')
                     <!--</div>-->
-                    {!! Breadcrumbs::renderIfExists() !!}
+                    {!! '<!--remah2-->'.Breadcrumbs::renderIfExists().'<!--remah2-->'  !!}
                     <!--</div>-->
                 </section>
 
@@ -461,14 +461,13 @@
 
     @yield('FooterInclude')
     <?php
-        echo 'Pic : '.Auth::user()->profile_pic;
         /*if (Auth::user()->email == "Not available")
         {
             $avatar = 'c'
         }*/
     ?>
     <script id="chat-widget" data-user_id="{{ Auth::user()->id }}" data-avatar="{!! Auth::user()->profile_pic !!}" src="{{asset("chat-widget/chat/chat.js")}}"></script>
-    <div>{{ csrf_token() }}</div>
+    <!--<div>{{ csrf_token() }}</div>-->
 
 </body>
 <script>

@@ -157,6 +157,8 @@
     $( "#1assign" ).removeClass('modal')
     $( "#banemail" ).removeClass('modal')
     $( "#Edit" ).removeClass('modal')
+    $( "#2assign" ).removeClass('modal')
+    $( "#15assign" ).removeClass('modal')
 
 
     socket.on('incoming_message', (data, cb) =>
@@ -192,10 +194,10 @@
         }
     })
 
-    $('#chat-widget').after('<div id="chat-box" style="position:absolute; bottom: 1em; right: 1em"><ons-fab ripple id="chat-button"><ons-icon icon="md-inbox" size="32px, material:24px"></ons-icon></ons-fab></div>')
+    $('#chat-widget').after('<div id="chat-box" style="position:fixed; bottom: 1em; right: 1em"><ons-fab ripple id="chat-button"><ons-icon icon="md-inbox" size="32px, material:24px"></ons-icon></ons-fab></div>')
 
     //$('#chat-box').after(<div id="chat-room" style="display: none;  overflow:auto; border-radius: 10px; background-color: red; position: absolute; bottom: 3em; right: 3em; height: 33%; width: 20%"><ons-page><ons-toolbar><div class="center">IM</div><div class="right"><ons-toolbar-button><ons-icon icon="ion-close-round, material:md-menu"></ons-icon></ons-toolbar-button></div></ons-toolbar><div style="position: absolute; bottom: 0em; max-width:60%; float: left"><ons-input id="username" modifier="underbar" placeholder="Username" float></ons-input></div><div style="position: absolute; bottom: 0em; right: 0em; overflow: hidden"><ons-button onclick="return false">SEND</ons-button></div></ons-page></div>')
-    $('#chat-box').after(`<div id="chat-room" style="display: none; border-radius: 10px; background-color: red; position: absolute; bottom: 9em; right: 4em; height: 40%; width: 20%; z-index:99999">
+    $('#chat-box').after(`<div id="chat-room" style="display: none; border-radius: 10px; background-color: red; position: fixed; bottom: 9em; right: 4em; height: 40%; width: 20%; z-index:99999">
       <div class="box box-primary direct-chat direct-chat-primary">
         <div class="box-header with-border">
           <h3 class="box-title">Direct Chat</h3>
@@ -232,7 +234,16 @@
 </div>`)
 
     // Toggle the chat widget
-    $('#chat-button').click(() => {$('#chat-room').toggle('clip')})
+    $('#chat-button').click(() => {
+        try {
+            $('#chat-room').toggle('clip')
+        }
+
+        catch(err) {
+            console.log(err)
+        }
+    })
+
 
     //$('body').on('click', '#contact-button', function(event) {
     // Toggle the contact list

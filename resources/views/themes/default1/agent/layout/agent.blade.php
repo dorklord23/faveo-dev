@@ -65,7 +65,7 @@
 
         @yield('HeadInclude')
     </head>
-    <body class="skin-blue fixed">
+    <body class="skin-blue fixed" style="overflow:scroll">
         <div class="wrapper">
             <header class="main-header">
                 <a href="http://www.faveohelpdesk.com" class="logo"><img src="{{ asset('lb-faveo/media/images/logo.png')}}" width="100px;"></a>
